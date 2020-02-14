@@ -30,18 +30,20 @@ def userMaker(file):
             name["phone"] = row["PHONE2"]
             if row['Z305_BOR_TYPE'] in ["EM", "RE", "SP"]:
                 group = row["Z305_BOR_STATUS"] + "AC"
-                print (group)
+                #print (group)
             else:
                 group =  row["Z305_BOR_STATUS"]+ row['Z305_BOR_TYPE']
             groupUUID = userGroup.groups("userGroups.csv", group)
 
             if address:
-                address["postalCode"]= space_snip(row["ZIP1"])
+
+                if  len (space_snip(row["ZIP1"])) > 3:
+                    address['postalCode'] = space_snip(row["ZIP1"])
                 name["addresses"] = [address]
 
             newUser = userRecord(
                 id = str(x),
-             externalSystemId = space_snip(row["EXTERNAL_ID"]),
+                externalSystemId = space_snip(row["EXTERNAL_ID"]),
                 barcode =  space_snip(row['BARCODE']),
                 type = row['Z305_BOR_TYPE'],
                 personal = name,
