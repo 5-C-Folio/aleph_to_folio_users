@@ -9,9 +9,9 @@ Migrate current users from Aleph user database to Folio compliant JSON
 * Python 3.x
 
 ## Instructions
-1 obtain credentials for Aleph oracle db and place as json in password.json
-2 In query, specify the ADM to use and any limits on patron group by adding a WHERE in the query
-3 Run querytouser.py
+1. obtain credentials for Aleph oracle db and place as json in password.json
+2. In query, specify the ADM to use and any limits on patron group by adding a WHERE in the query
+3. Run querytouser.py
 ```Depending on the where clause and the size of the query, the process may take a while and produce a very large file```
 
 
