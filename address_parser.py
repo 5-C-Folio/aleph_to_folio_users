@@ -1,32 +1,79 @@
 import re
+import usaddress
+#https://usaddress.readthedocs.io/en/latest/
+def truthChecker(dict, dictvalue):
+    if dict.get(dictvalue):
+        return dict.get(dictvalue)
 
 class address_parser():
     def __init__(self, address):
         self.address = address
 
 
-
     def parse(self):
-        y = re.sub("  +", ";", self.address)
-        #create a list based on the ;
-        y = y.split(";")
-        #ignore [0] and define [1] as address 1
+        y = re.sub("  +", "; ", self.address)
+        x = y.split(';')
+        z = " ".join(x[1:])
+        address = {}
+        try:
+            rawAddress, addressType = usaddress.tag(z)
+            addDict = dict(rawAddress)
+            if addressType == 'PO Box':
+                addressLine1 = addDict.get("USPSBoxType", '') + ' ' + addDict.get('USPSBoxID', '')
+                address['addressLine1'] = addressLine1
+                if addDict.get('Recipient', None):
+                    addressLine2 = addDict.get('Recipient', None)
+                    address['addressLine2'] = addressLine2
+                if  addDict.get('PlaceName',None):
+                    city = addDict.get('PlaceName', None)
+                    address["city"] = city
+                    print (city)
+                if  addDict.get('StateName',None):
+                    statename = addDict.get('StateName', None)
+                    address['region'] = statename
+                return address
+            if addressType == 'Street Address':
+                addressLine1 = []
+                addressLine1.append(addDict.get("AddressNumber", ''))
+                addressLine1.append(addDict.get("StreetNamePreDirectional", ''))
+                addressLine1.append(addDict.get("StreetName", ''))
+                addressLine1.append(addDict.get("StreetNamePostType", ''))
+                address['addressLine1']= re.sub(" +", ' ', ' '.join(addressLine1))
 
-        if len(y) > 2:
-            address1 = y[1]
-            city_state = y[2]
+                addressLine2 = []
+                addressLine2.append(addDict.get('BuildingName',''))
+                addressLine2.append(addDict.get("OccupancyType",''))
+                addressLine2.append(addDict.get('OccupancyIdentifier',''))
+                if  ' '.join(addressLine2) != '  ':
+                    address["addressLine2"] = ' '.join(addressLine2)
 
-            if "," in city_state:
-                city_list = city_state.split(",")
-                city = city_list[0]
-                state = city_list[1]
+                if addDict.get('StateName', None):
+                    address['region'] = addDict['StateName']
 
-                return {"addressLine1":address1, "city":city, "region": state}
-            else:
 
-                return {"addressLine1":address1, "addressLine2":f"{city_state}"}
-            #if the address doesn't conform to a normal looking address field
-        else: pass
+                if addDict.get("PlaceName", None):
+                    address['city'] = addDict["PlaceName"]
+
+                if addDict.get('ZipCode', None):
+                    address['postalCode'] = addDict['ZipCode']
+                return address
+
+
+
+        except usaddress.RepeatedLabelError:
+            x = y.split(';')
+            if len(x) > 2:
+                address1 = x[1]
+                city_state = x[2]
+
+                if "," in city_state:
+                    city_list = city_state.split(",")
+                    city = city_list[0]
+                    state = city_list[1]
+
+                    return {"addressLine1": address1, "city": city, "region": state}
+
+            return address
 
 
 class nameSplit():
