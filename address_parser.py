@@ -27,12 +27,15 @@ class address_parser():
                 if  addDict.get('PlaceName',None):
                     city = addDict.get('PlaceName', None)
                     address["city"] = city
-                    print (city)
                 if  addDict.get('StateName',None):
                     statename = addDict.get('StateName', None)
                     address['region'] = statename
+                if addDict.get('ZipCode', None):
+                    address['postalCode'] = addDict['ZipCode']
+
+
                 return address
-            if addressType == 'Street Address':
+            if addressType == 'Street Address' or addressType == 'Ambiguous' :
                 addressLine1 = []
                 addressLine1.append(addDict.get("AddressNumber", ''))
                 addressLine1.append(addDict.get("StreetNamePreDirectional", ''))
@@ -50,13 +53,14 @@ class address_parser():
                 if addDict.get('StateName', None):
                     address['region'] = addDict['StateName']
 
-
                 if addDict.get("PlaceName", None):
                     address['city'] = addDict["PlaceName"]
 
                 if addDict.get('ZipCode', None):
                     address['postalCode'] = addDict['ZipCode']
                 return address
+            if addressType == 'Ambiguous' :
+                print ('oops')
 
 
 

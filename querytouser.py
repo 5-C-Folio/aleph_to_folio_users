@@ -26,21 +26,35 @@ def userMaker():
     outputFile = []
     for row in aleph:
             id = uuid.uuid4()
+            addresses = []
             if row['ADDRESS1']:
                 address = address_parser(row['ADDRESS1'])
                 address = address.parse()
-            elif row['ADDRESS2']:
+                addresses.append(address)
+                try:
+                    if row["ZIP1"] is not None:
+                        address["postalCode"] = space_snip(str(row["ZIP1"]))
+
+                except TypeError:
+                    print ("address 1 type error")
+
+
+            if row['ADDRESS2']:
                 address = address_parser(row['ADDRESS2'])
-                address = address.parse()
-            try:
-                if row["ZIP1"] is not None:
-                    address["postalCode"] = space_snip(str(row["ZIP1"]))
-                elif row["ZIP2"]:
-                    address["postalCode"] = space_snip(str(row["ZIP2"]))
-                else:
-                    address["postalCode"]=''
-            except TypeError:
-                continue
+                address2 = address.parse()
+                addresses.append(address2)
+
+                if row.get("ZIP2", None ) is not None:
+                        zip2 = str(row["ZIP2"])
+                        print(zip2)
+                        zip2 = space_snip(zip2)
+                        print(zip2)
+                        address2["postalCode"] = str(zip2)
+
+
+
+                #except TypeError:
+                 #   print("address2 type error", row["ZIP2"], len(row["ZIP2"]))
 
 
             name = nameSplit(row["Z303_NAME"])
@@ -81,7 +95,8 @@ def userMaker():
             else:
                 rowtype = ''
 
-            name["addresses"] = [address]
+            name["addresses"] = addresses
+
             newUser = userRecord(
                 id = str(id))
             if ex:
